@@ -1,11 +1,16 @@
+Please note this is a fork of Carl Vondrick's work, specifically the Doctrine-1.2 branch hosted here: 
+
+http://svn.symfony-project.com/plugins/sfLucenePlugin/branches/1.2-Doctrine/
+
+
 Warning : This is a work in progress and it has been tested only with Doctrine
 
 = Introduction =
 sfLucenePlugin integrates symfony and Zend Search Lucene to instantly add a search engine to your application.  The plugin will auto-detect your ORM layer : Doctrine and Propel.
 
 = Requirements =
-  * symfony 1.1 
-  * Propel 1.2 / 1.3 or Doctrine 1.0
+  * symfony 1.4
+  * Doctrine 1.2
   * PHP 5.2.x+
 
 sfLucene ships with all external dependencies satisfied and will work on both private and shared hosting environments.
@@ -24,8 +29,10 @@ The 1.1 branch for sfLucene will work, however it is not rock-solid stable.  Ple
 = Installation =
   * Install the plugin (from project directory):
 {{{
-svn co http://svn.symfony-project.com/plugins/sfLucenePlugin/branches/1.1 plugins/sfLucenePlugin
+cd plugins
+git clone git://github.com/mbrung/sfLucenePlugin.git
 }}}
+
   * Initialize configuration files (ignore this if you are upgrading):
 {{{
 symfony lucene:initialize myapp
@@ -54,7 +61,7 @@ Similar to your schema.yml file, you can have multiple indexes.  The only requir
 If you require i18n support, you must define the cultures that you support under index.  Use the following syntax:
 {{{
 index:
-  cultures: [en_US, fr_FR]
+  cultures: [en, fr]
 }}}
 
 (If you receive an exception saying "Culture XXX is not enabled" then define the culture even if you do not use i18n.)
@@ -164,15 +171,8 @@ sfLucenePropelBehavior::setLock(false); // enables Propel behavior, does index
 By default, the behavior is not locked so indexing does occur.
 
 == Advanced Model Settings ==
-You can configure the model even more.  If the peer does not follow symfony's naming conventions, you can specify a new one with in the project level search.yml:
-{{{
-MyIndex:
-  models:
-    BlogPost:
-      peer: OtherPeer
-}}}
 
-Further, sfLucene optimizes memory usage when rebuilding the index from the database by using both an internal pager and hydrating objects on demand.  By default, rows are selected in batches of 250, but if you require this to be different, you can customize it like so:
+sfLucene optimizes memory usage when rebuilding the index from the database by using both an internal pager and hydrating objects on demand.  By default, rows are selected in batches of 250, but if you require this to be different, you can customize it like so:
 
 {{{
 MyIndex:
@@ -181,7 +181,10 @@ MyIndex:
       rebuild_limit: 250
 }}}
 
-If only some of your objects should be stored in the index, you can define an validating method on the model that can return a boolean indicating whether the model should be indexed.  If this method returns true, the indexer proceeds with indexing.  If the method returns false, the indexer ignores that particular instance.  By default, the indexer looks for an "isIndexable" method and calls it if it is available.  However, you can specify your own method like so:
+If only some of your objects should be stored in the index, you can define an validating method on the model that can return a boolean indicating whether the model should be indexed.  If this method returns true, the indexer proceeds with indexing.  If the method returns false, the indexer ignores that particular instance.
+
+You need to specify the method to call like so ("isIndexable" is a good name):
+
 {{{
 MyIndex:
   models:
@@ -277,6 +280,14 @@ models:
     partial: forum/searchResult
 }}}
 
+Alternatively you may use a named route, like so:
+
+{{{
+models:
+  BlogPost:
+    route: @show_post?slug=%slug%
+}}}
+
 For ForumPost, the partial apps/myapp/modules/forum/templates/_searchResult.php is loaded.  This partial is given a $result object that you can use to build that result.  The API for this object is pretty simple:
 
   * {{{ $result->getInternalTitle() }}} returns the title of the search result.
@@ -299,7 +310,6 @@ all:
 This will prevent sfLucene from giving the user the option to use the advanced mode.
 
 == Routing ==
-Note: This is currently broken because symfony 1.1 does not currently support this.  The symfony god, Fabien, is planning to fix this.  Until then, you have to register your own routes.  See ticket #2408 and symfony-devs mailing list.
 
 sfLucene will automatically register friendly routes with symfony.  For example, surfing to {{{ http://example.org/search }}} will route to sfLucene.  If you would like to customize these routes, you can disable them in the app.yml file with:
 

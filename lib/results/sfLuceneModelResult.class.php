@@ -54,7 +54,12 @@ class sfLuceneModelResult extends sfLuceneResult
       throw new sfLuceneIndexerException(sprintf('A route for model "%s" was not defined.', $this->getInternalModel()));
     }
 
-    return preg_replace('/%(\w+?)%/e', '$this->result->getDocument()->getFieldValue("$1")', $model->get('route'));
+    $route = $model->get('route');
+    $route_with_params = preg_replace('/%(\w+?)%/e', '$this->result->getDocument()->getFieldValue("$1")', $model->get('route'));
+    if (strpos($route,"@")==0) {
+    	$route_with_params = sfContext::getInstance()->getController()->genUrl($route_with_params);
+    } 
+    return $route_with_params;
   }
 
   /**

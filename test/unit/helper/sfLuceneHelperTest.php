@@ -22,7 +22,7 @@ $app = $limeade->bootstrap();
 
 sfLuceneToolkit::loadZend();
 
-sfLoader::loadHelpers(array('sfLucene'));
+sfContext::getInstance()->getConfiguration()->loadHelpers(array('sfLucene'));
 
 // intercepts includes to partials
 function include_partial($partial = null, $params = null, $dump = false)

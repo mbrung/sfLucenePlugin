@@ -205,7 +205,7 @@ class sfLuceneHighlightFilter extends sfFilter
     if ($css && false !== ($pos = stripos($content, '</head>')))
     {
 
-      sfLoader::loadHelpers(array('Tag', 'Asset'));
+      sfContext::getInstance()->getConfiguration()->loadHelpers(array('Tag', 'Asset'));
 
       $css = stylesheet_tag($css);
 

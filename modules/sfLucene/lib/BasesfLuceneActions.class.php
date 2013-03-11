@@ -282,7 +282,7 @@ abstract class BasesfLuceneActions extends sfActions
 
   protected function translate($text, $args = array(), $ns = 'messages')
   {
-    sfContext::getInstance()->getConfiguration()->('I18N');
+    sfContext::getInstance()->getConfiguration()->loadHelpers('I18N');
 
     return __($text, $args, $ns);
   }
